@@ -1,5 +1,3 @@
-import csv
-
 class Package:
     def __init__(self, package_id, address, city, state, zipcode, deadline, weight, notes):
         self.package_id = int(package_id)
@@ -26,14 +24,6 @@ class HashTable:
     def __init__(self):
         self.table = [[0]*10 for _ in range(10)]
 
-    def __str__(self):
-        return (
-            f'Package ID: {self.table}')
-
-    def __repr__(self):
-        return (
-            f'Package ID: {self.table}')
-
     def insert(self, package):
         primary = package.package_id // 10
         secondary = package.package_id % 10
@@ -44,13 +34,22 @@ class HashTable:
         secondary = package_id % 10
         return self.table[primary][secondary-1]
 
+    def __str__(self):
+        return (
+            f'Package ID: {self.table}')
+
+    def __repr__(self):
+        return (
+            f'Package ID: {self.table}')
+
 hash_table = HashTable()
 
-with open('simulation_data/package_file.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile)
-    header = next(reader)
-    for row in reader:
-        package = Package(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-        hash_table.insert(package)
+with open('simulation_data/package_file.csv', 'r') as f:
+    lines = f.readlines()
+
+for line in lines[1:]:
+    row = line.strip().split(',')
+    package = Package(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+    hash_table.insert(package)
 
 print(hash_table.lookup(23))
