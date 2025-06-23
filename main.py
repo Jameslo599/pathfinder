@@ -16,7 +16,7 @@ with open('simulation_data/package_file.csv', 'r') as f:
 for line in lines[1:]:
     row = line.strip().split(',')
     package = Package(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-    hash_table.insert(package)
+    hash_table.insert(package.package_id, package)
 # Mark delayed packages
 hash_table.mark_delayed([6, 25, 28, 32])
 

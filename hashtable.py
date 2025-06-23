@@ -3,9 +3,10 @@ class HashTable:
     def __init__(self):
         self.table = [[0]*10 for _ in range(4)]
 
-    def insert(self, package):
-        primary = (package.package_id - 1) // 10
-        secondary = package.package_id % 10
+    # Insertion function accepts the package object as an argument to be more dynamic in case there were unsorted datasets.
+    def insert(self, package_id, package):
+        primary = (package_id - 1) // 10
+        secondary = package_id % 10
         self.table[primary][secondary-1] = package
 
     # Step B: lookup function
