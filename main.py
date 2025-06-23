@@ -40,6 +40,7 @@ for line in lines:
 def find_distance(curr, dest):
     primary = addresses[curr]
     secondary = addresses[dest]
+    # Handle instances where the locations are reversed
     if primary >= secondary:
         return float(distances[primary][secondary])
     else:
@@ -66,36 +67,36 @@ for packages in hash_table.table:
 
 # Execute deliveries with a single truck at specified start time
 def delivery(truck, start_time):
-    # mark status in progress
+    # Mark status in progress
     for package in truck:
         package.delivery_status = "En Route"
-    # current location
+    # Current location
     truck_address = "Hub"
     # 0.3 miles per minute
     truck_speed = 18 / 60
     total_miles = 0
-    # continue while there are still undelivered packages
+    # Continue while there are still undelivered packages
     while len(truck) > 0:
         current_package = None
         shortest_distance = float("inf")
-        # iterate through packages to find shortest next delivery
+        # Iterate through packages to find shortest next delivery
         for package in truck:
             distance = find_distance(truck_address, package.address)
             if distance < shortest_distance:
                 shortest_distance = distance
                 current_package = package
         truck_address = current_package.address
-        # calculate delivery time using math.ceil to provide a conservative time estimation
+        # Calculate delivery time using math.ceil to provide a conservative time estimation
         total_miles+=shortest_distance
         delivery_time = timedelta(minutes=math.ceil(total_miles / truck_speed))
-        # update hash table with package delivery, loading times and delivery status
+        # Update hash table with package delivery, loading times and delivery status
         package = hash_table.lookup(current_package.package_id)
         package.loading_time = start_time.time().strftime("%H:%M")
         package.delivery_time = (delivery_time + start_time).time().strftime("%H:%M")
         package.delivery_status = "Delivered"
         truck.remove(current_package)
 
-    # calculate return distance
+    # Calculate return distance
     total_miles+=find_distance(truck_address, "Hub")
     delivery_time = timedelta(minutes=math.ceil(total_miles / truck_speed))
     total_time = delivery_time + start_time
@@ -104,10 +105,47 @@ def delivery(truck, start_time):
 truck1_end = delivery(truck1, datetime.combine(datetime.today(), time(8, 0)))
 truck2_end = delivery(truck2, datetime.combine(datetime.today(), time(9, 5)))
 truck3_end = delivery(truck3, datetime.combine(datetime.today(), time(truck1_end["end_hour"], truck1_end["end_minute"])))
-# calculate total miles
-# print(f'{round(truck1_end["miles"] + truck2_end["miles"] + truck3_end["miles"], 2)} total miles')
 
-user_hour = 10
-user_minute = 29
-hash_table.table[0][0].update_status(time(8, 38))
-print(hash_table.table[0][0])
+class Main:
+    # User Interface to lookup package statuses
+    # Greeting message
+    print("Western Governors University Parcel Service (WGUPS)")
+    # Calculate total miles and display
+    print(f'The total mileage for this route is: {round(truck1_end["miles"] + truck2_end["miles"] + truck3_end["miles"], 2)} total miles')
+    action = input('To lookup a package, type "lookup". To quit program, type anything else.')
+    if action == "lookup":
+        try:
+            # Prompt user for hour time
+            user_hour = int(input("Enter an hour number between 0-23 (24-hour time)"))
+            # Prompt user for minute time
+            user_minute = int(input("Enter an minute number between 0-59 (59-minute time)"))
+            time = time(user_hour, user_minute)
+            # Prompt user for single or all packages lookup
+            lookup_num = input('Enter "single" to lookup a package at specified time, or "all" to lookup all packages. To exit enter anything else.')
+            if lookup_num == "single":
+                try:
+                    # Prompt for package ID
+                    package_id = int(input("Enter the numeric package ID"))
+                    package = hash_table.lookup(package_id)
+                    package.update_status(time)
+                    print(package)
+                except ValueError:
+                    print("Invalid package ID")
+                    exit()
+            elif lookup_num == "all":
+                try:
+                    # Lookup the entire range of package ids and display with requested time
+                    for package_id in range(1, 41):
+                        package = hash_table.lookup(package_id)
+                        package.update_status(time)
+                        print(package)
+                except ValueError:
+                    print("Internal error, please try again.")
+                    exit()
+            else:
+                exit()
+        except ValueError:
+            print("Invalid time input. Please try again.")
+            exit()
+
+

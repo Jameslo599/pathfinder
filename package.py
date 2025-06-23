@@ -15,10 +15,14 @@ class Package:
         self.delivery_status = "At Hub"
 
     def update_status(self, input_time):
-        parsed_time = datetime.strptime(self.delivery_time, "%H:%M").time()
-        if input_time < time(8, 0):
+        parsed_loading = datetime.strptime(self.loading_time, "%H:%M").time()
+        parsed_delivery = datetime.strptime(self.delivery_time, "%H:%M").time()
+        if self.package_id == 9 and input_time < time(10, 20):
+            self.address = "300 State St"
+            self.zip = "84103"
+        if input_time < parsed_loading:
             self.delivery_status = "At Hub"
-        elif input_time < parsed_time:
+        elif input_time < parsed_delivery:
             self.delivery_status = "En Route"
         else:
             self.delivery_status = "Delivered"
