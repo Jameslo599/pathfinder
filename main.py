@@ -17,8 +17,7 @@ for line in lines[1:]:
     row = line.strip().split(',')
     package = Package(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
     hash_table.insert(package.package_id, package)
-# Mark delayed packages
-hash_table.mark_delayed([6, 25, 28, 32])
+
 
 # Distance Data
 addresses = {}
@@ -58,11 +57,14 @@ for packages in hash_table.table:
     for package in packages:
         if package.package_id in set1:
             package.loading_time = datetime.combine(datetime.today(), time(8, 0))
+            package.truck_number = 1
             truck1.append(package)
         elif package.package_id in set2:
             package.loading_time = datetime.combine(datetime.today(), time(9, 5))
+            package.truck_number = 2
             truck2.append(package)
         else:
+            package.truck_number = 3
             truck3.append(package)
 
 # Execute deliveries with a single truck at specified start time
@@ -111,6 +113,9 @@ class Main:
     # Greeting message
     print("Western Governors University Parcel Service (WGUPS)")
     # Calculate total miles and display
+    print(f'Truck 1 Mileage: {round(truck1_end["miles"], 2)}')
+    print(f'Truck 2 Mileage: {round(truck2_end["miles"], 2)}')
+    print(f'Truck 3 Mileage: {round(truck3_end["miles"], 2)}')
     print(f'The total mileage for this route is: {round(truck1_end["miles"] + truck2_end["miles"] + truck3_end["miles"], 2)} total miles')
     action = input('To lookup a package, type "lookup". To quit program, type anything else.')
     if action == "lookup":
